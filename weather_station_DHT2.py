@@ -30,8 +30,9 @@ def main():
     api_key = config.readline()[:-1]
     config.close()
     
-    interval = 900 #oletuksena 15 minuutin periodi
+    default_interval = 900 #oletuksena 15 minuutin periodi
     enabled = 1
+    interval = default_interval
     
     while True:
         
@@ -118,7 +119,14 @@ def main():
         if success:
             enabled = int(enabled_)
         else:
-            enabled = 1   
+            enabled = 1
+
+        if enabled == 1:
+            success, interval_ = read_parameter(curs, "interval")
+            if success:
+                interval = int(interval_)
+            else:
+                interval = default_interval
             
 if __name__ == "__main__":
     main()
