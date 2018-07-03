@@ -29,7 +29,7 @@ def read_parameter(curs, parameter_name):
 
 def main():
     
-    DEFAULT_INTERVAL = 5    #5 sekuntia
+    DEFAULT_INTERVAL = 900    #15 minuuttia
     GPIO_PIN = 23
 
     enabled = 1
@@ -98,7 +98,7 @@ def main():
             if success:
                 interval = int(interval_)
             else:
-                interval = 900
+                interval = DEFAULT_INTERVAL
             
             success, enabled_ = read_parameter(curs, "enabled")
             if success:
