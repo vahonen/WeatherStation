@@ -29,15 +29,37 @@ def read_parameter(curs, parameter_name):
 
 def main():
     
-    default_interval = 900 #oletuksena 15 minuutin periodi
+    DEFAULT_INTERVAL = 5    #5 sekuntia
+    GPIO_PIN = 23
+
     enabled = 1
-    interval = default_interval
-    GPIO_pin = 23
+    interval = DEFAULT_INTERVAL
+    
     
     while True:
         
+        con = connect_database();
+        curs=con.cursor()
+        
+        success, enabled_ = read_parameter(curs, "enabled")
+        if success:
+            enabled = int(enabled_)
+        else:
+            enabled = 1
+            print( "Virhe: parametrin luku ei onnistunut (2)")
+
+        print("ulompi looppi: enabled %s" % (enabled)) #testitulostusta
+        if enabled == 1:
+            success, interval_ = read_parameter(curs, "interval")
+            if success:
+                interval = int(interval_)
+            else:
+                interval = DEFAULT_INTERVAL
+                print( "Virhe: parametrin luku ei onnistunut (3)")
+        print("ulompi: interval %s" % (interval)) #testitulostusta
+        
         while enabled == 1:
-            humidity, temperature = dht.read_retry(dht.DHT22, GPIO_pin)
+            humidity, temperature = dht.read_retry(dht.DHT22, GPIO_PIN)
             temperature = round(temperature, 1)
             humidity = round(humidity, 1)    
     
@@ -104,29 +126,7 @@ def main():
                         enabled = 1
                         print( "Virhe: parametrin luku ei onnistunut (1)")
                     read_counter = 0
-                    print("sisempi looppi: enabled %s" % (enabled)) #testitulostusta
-
-        
-        
-        con = connect_database();
-        curs=con.cursor()
-        
-        success, enabled_ = read_parameter(curs, "enabled")
-        if success:
-            enabled = int(enabled_)
-        else:
-            enabled = 1
-            print( "Virhe: parametrin luku ei onnistunut (2)")
-
-        print("ulompi looppi: enabled %s" % (enabled)) #testitulostusta
-        if enabled == 1:
-            success, interval_ = read_parameter(curs, "interval")
-            if success:
-                interval = int(interval_)
-            else:
-                interval = default_interval
-                print( "Virhe: parametrin luku ei onnistunut (3)")
-        print("ulompi: interval %s" % (interval)) #testitulostusta
+                    print("sisempi looppi: enabled %s" % (enabled)) #testitulostust
         
         time.sleep(10) #odotetaan 10 s ennen kuin seuraavan kerran tarkistetaan onko mittaus päällä
 
